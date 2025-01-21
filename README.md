@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -48,3 +49,7 @@ export default tseslint.config({
   },
 })
 ```
+=======
+# AutoCRM
+AutoCRM is a customizable and AI-powered customer relationship management platform designed to streamline workflows, enhance client engagement, and boost team productivity.
+>>>>>>> 711832ab03288b84f86aa6760314698b07bede63

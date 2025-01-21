@@ -24,7 +24,7 @@ export default function Home() {
             Create and manage support tickets for your customers
           </p>
           <Link
-            to="/tickets/new"
+            to="/tickets/create"
             className="inline-flex items-center justify-center w-full bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             Create Ticket
