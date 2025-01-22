@@ -1,14 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import type { User } from '@supabase/supabase-js'
 
 export default function CreateTicket() {
   const navigate = useNavigate()
+  const [user, setUser] = useState<User | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    // Get current user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate('/login')
+        return
+      }
+      setUser(session.user)
+    })
+  }, [navigate])
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!user) {
+      setError('You must be logged in to create a ticket')
+      return
+    }
+
     setIsSubmitting(true)
     setError(null)
 
@@ -18,11 +36,18 @@ export default function CreateTicket() {
     const priority = formData.get('priority') as string
 
     try {
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('tickets')
-        .insert([{ title, description, priority, status: 'new' }])
+        .insert([{ 
+          title, 
+          description, 
+          priority, 
+          status: 'new',
+          user_id: user.id,  // Add the user ID to the ticket
+          created_at: new Date().toISOString()
+        }])
 
-      if (error) throw error
+      if (insertError) throw insertError
       navigate('/tickets')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create ticket')
