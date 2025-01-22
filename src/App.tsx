@@ -1,4 +1,4 @@
-import React from 'react'
+// Remove the React import since we're not using it directly
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
@@ -6,7 +6,7 @@ import Login from './pages/Login'
 import Tickets from './pages/Tickets'
 import CreateTicket from './pages/CreateTicket'
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
       <Routes>
