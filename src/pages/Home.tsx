@@ -1,6 +1,44 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+
+type TicketStats = {
+  total: number
+  open: number
+  resolvedToday: number
+}
 
 export default function Home() {
+  const [stats, setStats] = useState<TicketStats>({
+    total: 0,
+    open: 0,
+    resolvedToday: 0
+  })
+
+  useEffect(() => {
+    const fetchTicketStats = async () => {
+      // Get all tickets
+      const { data: tickets } = await supabase
+        .from('tickets')
+        .select('status, created_at')
+
+      if (tickets) {
+        const today = new Date().toISOString().split('T')[0]
+        
+        setStats({
+          total: tickets.length,
+          open: tickets.filter(t => t.status === 'new' || t.status === 'in_progress').length,
+          resolvedToday: tickets.filter(t => 
+            t.status === 'resolved' && 
+            t.created_at.startsWith(today)
+          ).length
+        })
+      }
+    }
+
+    fetchTicketStats()
+  }, [])
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Welcome Section */}
@@ -67,15 +105,15 @@ export default function Home() {
       {/* Stats Section */}
       <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-          <div className="text-2xl font-bold text-blue-600">0</div>
+          <div className="text-2xl font-bold text-blue-600">{stats.open}</div>
           <div className="text-gray-600">Open Tickets</div>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-          <div className="text-2xl font-bold text-green-600">0</div>
+          <div className="text-2xl font-bold text-green-600">{stats.resolvedToday}</div>
           <div className="text-gray-600">Resolved Today</div>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-          <div className="text-2xl font-bold text-purple-600">0</div>
+          <div className="text-2xl font-bold text-purple-600">{stats.total}</div>
           <div className="text-gray-600">Total Tickets</div>
         </div>
       </div>

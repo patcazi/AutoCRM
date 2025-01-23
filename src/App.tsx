@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Tickets from './pages/Tickets'
 import CreateTicket from './pages/CreateTicket'
+import EmployeeDashboard from './pages/EmployeeDashboard'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/tickets" element={<Tickets />} />
           <Route path="/tickets/create" element={<CreateTicket />} />
+          <Route path="/dashboard" element={<EmployeeDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

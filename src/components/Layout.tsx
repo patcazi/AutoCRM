@@ -6,17 +6,21 @@ import type { User } from '@supabase/supabase-js'
 export default function Layout() {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
+  const [isEmployee, setIsEmployee] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      // Check if user has employee role
+      setIsEmployee(session?.user?.user_metadata?.role === 'employee')
     })
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      setIsEmployee(session?.user?.user_metadata?.role === 'employee')
     })
 
     return () => subscription.unsubscribe()
@@ -53,6 +57,14 @@ export default function Layout() {
               >
                 Tickets
               </Link>
+              {isEmployee && (
+                <Link
+                  to="/dashboard"
+                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Dashboard
+                </Link>
+              )}
               <Link
                 to="/profile"
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
