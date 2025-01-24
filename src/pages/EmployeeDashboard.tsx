@@ -13,7 +13,7 @@ type Ticket = {
 
 type Note = {
   id: string
-  ticket_id: string
+  // ticket_id?: string // You can remove this if you want, or leave it optional
   created_by: string
   note: string
   created_at: string
@@ -40,6 +40,7 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
   useEffect(() => {
     if (ticket) {
       const fetchNotes = async () => {
+        // Revert to selecting only the fields you need (no ticket_id here)
         const { data } = await supabase
           .from('ticket_notes')
           .select(`
@@ -70,18 +71,21 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
 
     try {
       const { data: userData } = await supabase.auth.getUser()
-      console.log('User Data:', userData)
       if (!userData.user) {
         throw new Error('You must be logged in to add notes')
       }
 
+      // Revert to selecting only the fields you need (no ticket_id here)
       const { data, error } = await supabase
         .from('ticket_notes')
-        .insert([{
-          ticket_id: ticket.id,
-          note: newNote.trim(),
-          created_by: userData.user.id
-        }])
+        .insert([
+          {
+            // The DB relationship automatically handles linking if your schema is set up that way
+            ticket_id: ticket.id,
+            note: newNote.trim(),
+            created_by: userData.user.id
+          }
+        ])
         .select(`
           id,
           note,
@@ -205,6 +209,13 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
                 )}
               </div>
             </div>
+
+            {/* Error display block (useful to see if an update fails) */}
+            {error && (
+              <div className="mt-2 text-sm text-red-600">
+                {error}
+              </div>
+            )}
 
             <div>
               <h3 className="text-sm font-medium text-gray-500">Description</h3>
@@ -435,4 +446,4 @@ export default function EmployeeDashboard() {
       )}
     </div>
   )
-} 
+}
