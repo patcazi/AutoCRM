@@ -286,6 +286,19 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
   )
 }
 
+function priorityRank(priority: string) {
+  switch (priority) {
+    case 'high':
+      return 1
+    case 'medium':
+      return 2
+    case 'low':
+      return 3
+    default:
+      return 4
+  }
+}
+
 export default function EmployeeDashboard() {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
@@ -302,7 +315,12 @@ export default function EmployeeDashboard() {
           .order('created_at', { ascending: false })
 
         if (error) throw error
-        setTickets(data || [])
+
+        const sortedData = (data || []).sort((a, b) => {
+          return priorityRank(a.priority) - priorityRank(b.priority)
+        })
+
+        setTickets(sortedData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch tickets')
       } finally {
