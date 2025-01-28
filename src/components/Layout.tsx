@@ -8,19 +8,49 @@ export default function Layout() {
   const [user, setUser] = useState<User | null>(null)
   const [isEmployee, setIsEmployee] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [profileName, setProfileName] = useState<string | null>(null)
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      // Check if user has employee role
-      setIsEmployee(session?.user?.user_metadata?.role === 'employee')
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      setIsEmployee(currentUser?.user_metadata?.role === 'employee')
+      
+      // Fetch profile name if user exists
+      if (currentUser) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', currentUser.id)
+          .single()
+        
+        if (data) {
+          setProfileName(data.name)
+        }
+      }
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      setIsEmployee(session?.user?.user_metadata?.role === 'employee')
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      setIsEmployee(currentUser?.user_metadata?.role === 'employee')
+      
+      // Fetch profile name if user exists
+      if (currentUser) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', currentUser.id)
+          .single()
+        
+        if (data) {
+          setProfileName(data.name)
+        }
+      } else {
+        setProfileName(null)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -82,7 +112,7 @@ export default function Layout() {
                     className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
                   >
                     <span className="text-sm font-medium">
-                      {user.email}
+                      {profileName || user?.user_metadata?.name || user?.email}
                     </span>
                     <svg
                       className="h-5 w-5"
@@ -101,7 +131,7 @@ export default function Layout() {
                     <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                       <div className="py-1">
                         <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                          Logged in as {user.email}
+                          Logged in as {profileName || user?.user_metadata?.name || user?.email}
                         </div>
                         <Link
                           to="/profile"
