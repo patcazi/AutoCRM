@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
           { role: "system", content: "You are a helpful AI assistant..." },
           { role: "user", content: prompt }
         ],
-        max_tokens: 100
+        max_tokens: 1000
       })
     });
 

@@ -72,7 +72,12 @@ export default function Tickets() {
                 <div className="text-sm text-gray-500 mb-1">
                   #{ticket.id.slice(0, 8)} • Created {formatDate(ticket.created_at)}
                 </div>
-                <h2 className="text-lg font-medium">{ticket.title}</h2>
+                <Link 
+                  to={`/tickets/${ticket.id}`}
+                  className="text-lg font-medium hover:text-blue-600"
+                >
+                  {ticket.title}
+                </Link>
               </div>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(ticket.status)}`}>
                 {ticket.status.replace('_', ' ')}

@@ -20,6 +20,7 @@ type Note = {
   profiles?: {
     email: string
   }
+  visibility: 'public' | 'private'
 }
 
 type TicketModalProps = {
@@ -63,8 +64,7 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
     }
   }, [ticket])
 
-  const handleAddNote = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleAddNote = async (visibility: 'public' | 'private') => {
     if (!ticket || !newNote.trim()) return
 
     setIsAddingNote(true)
@@ -77,22 +77,22 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
         throw new Error('You must be logged in to add notes')
       }
 
-      // Revert to selecting only the fields you need (no ticket_id here)
       const { data, error } = await supabase
         .from('ticket_notes')
         .insert([
           {
-            // The DB relationship automatically handles linking if your schema is set up that way
             ticket_id: ticket.id,
             note: newNote.trim(),
-            created_by: userData.user.id
+            created_by: userData.user.id,
+            visibility: visibility
           }
         ])
         .select(`
           id,
           note,
           created_at,
-          created_by
+          created_by,
+          visibility
         `)
 
       if (error) throw error
@@ -267,7 +267,7 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
             <h3 className="text-lg font-medium text-gray-900 mb-4">Notes</h3>
             
             {/* Add Note Form */}
-            <form onSubmit={handleAddNote} className="mb-6">
+            <form onSubmit={(e) => e.preventDefault()} className="mb-6">
               <textarea
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
@@ -302,9 +302,10 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
                   )}
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => handleAddNote('private')}
                   disabled={isAddingNote || !newNote.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                  className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-50 flex items-center space-x-2"
                 >
                   {isAddingNote ? (
                     <>
@@ -312,7 +313,22 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
                       <span>Adding...</span>
                     </>
                   ) : (
-                    'Add Note'
+                    'Add Note (Internal)'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddNote('public')}
+                  disabled={isAddingNote || !newNote.trim()}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                >
+                  {isAddingNote ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    'Send Message (Public)'
                   )}
                 </button>
               </div>
