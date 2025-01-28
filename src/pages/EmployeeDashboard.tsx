@@ -36,6 +36,8 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
   const [isAddingNote, setIsAddingNote] = useState(false)
   const [noteError, setNoteError] = useState<string | null>(null)
   const [noteSuccess, setNoteSuccess] = useState(false)
+  const [isGeneratingResponse, setIsGeneratingResponse] = useState(false)
+  const [generationError, setGenerationError] = useState<string | null>(null)
   
   useEffect(() => {
     if (ticket) {
@@ -105,6 +107,36 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
       setNoteError(err instanceof Error ? err.message : 'Failed to add note')
     } finally {
       setIsAddingNote(false)
+    }
+  }
+
+  const handleGenerateResponse = async () => {
+    if (!ticket) return
+
+    setIsGeneratingResponse(true)
+    setGenerationError(null)
+
+    try {
+      const response = await fetch('http://127.0.0.1:54321/functions/v1/generateResponse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Draft a helpful response regarding this ticket. Title: ${ticket.title}. Description: ${ticket.description}.`
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate response')
+      }
+
+      const data = await response.json()
+      setNewNote(data.response)
+    } catch (err) {
+      setGenerationError('Failed to generate AI response. Please try again.')
+    } finally {
+      setIsGeneratingResponse(false)
     }
   }
 
@@ -250,7 +282,25 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
               {noteSuccess && (
                 <p className="mt-1 text-sm text-green-600">Note added successfully</p>
               )}
-              <div className="mt-2 flex justify-end">
+              {generationError && (
+                <p className="mt-1 text-sm text-red-600">{generationError}</p>
+              )}
+              <div className="mt-2 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleGenerateResponse}
+                  disabled={isGeneratingResponse}
+                  className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-50 flex items-center space-x-2"
+                >
+                  {isGeneratingResponse ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    'Generate Response'
+                  )}
+                </button>
                 <button
                   type="submit"
                   disabled={isAddingNote || !newNote.trim()}
