@@ -39,18 +39,19 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
   const [noteSuccess, setNoteSuccess] = useState(false)
   const [isGeneratingResponse, setIsGeneratingResponse] = useState(false)
   const [generationError, setGenerationError] = useState<string | null>(null)
+  const [ticketCreator, setTicketCreator] = useState<string>('Unknown User')
   
   useEffect(() => {
     if (ticket) {
       const fetchNotes = async () => {
-        // Revert to selecting only the fields you need (no ticket_id here)
         const { data } = await supabase
           .from('ticket_notes')
           .select(`
             id,
             note,
             created_at,
-            created_by
+            created_by,
+            visibility
           `)
           .eq('ticket_id', ticket.id)
           .order('created_at', { ascending: false })
@@ -60,7 +61,19 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
         }
       }
 
+      const fetchCreator = async () => {
+        const { data: ticketCreatorProfile } = await supabase
+          .from('profiles')
+          .select('name, email')
+          .eq('user_id', ticket.user_id)
+          .single()
+
+        const creatorName = ticketCreatorProfile?.name || ticketCreatorProfile?.email || 'Unknown User'
+        setTicketCreator(creatorName)
+      }
+
       fetchNotes()
+      fetchCreator()
     }
   }, [ticket])
 
@@ -257,7 +270,7 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
             <div>
               <h3 className="text-sm font-medium text-gray-500">Created</h3>
               <p className="mt-1 text-sm text-gray-900">
-                {new Date(ticket.created_at).toLocaleString()}
+                {new Date(ticket.created_at).toLocaleString()} by {ticketCreator}
               </p>
             </div>
           </div>
@@ -338,7 +351,9 @@ function TicketModal({ ticket, onClose, onUpdate }: TicketModalProps) {
             <div className="space-y-4">
               {notes.map((note) => (
                 <div key={note.id} className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-900">{note.note}</div>
+                  <div className="text-sm text-gray-900" style={{ whiteSpace: 'pre-wrap' }}>
+                    {note.note}
+                  </div>
                   <div className="mt-2 text-xs text-gray-500">
                     {new Date(note.created_at).toLocaleString()}
                   </div>

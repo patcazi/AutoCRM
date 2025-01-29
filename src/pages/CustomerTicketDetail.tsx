@@ -142,7 +142,9 @@ export default function CustomerTicketDetail() {
           <div className="space-y-4">
             {notes.map(note => (
               <div key={note.id} className="bg-gray-50 rounded-lg p-4">
-                <p className="text-gray-900">{note.note}</p>
+                <p className="text-gray-900" style={{ whiteSpace: 'pre-wrap' }}>
+                  {note.note}
+                </p>
                 <p className="text-sm text-gray-500 mt-2">
                   {new Date(note.created_at).toLocaleString()}
                 </p>
