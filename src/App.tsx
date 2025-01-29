@@ -7,6 +7,7 @@ import Tickets from './pages/Tickets'
 import CreateTicket from './pages/CreateTicket'
 import EmployeeDashboard from './pages/EmployeeDashboard'
 import CustomerTicketDetail from './pages/CustomerTicketDetail'
+import MinimalProfile from './pages/MinimalProfile'
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/tickets/:ticketId" element={<CustomerTicketDetail />} />
           <Route path="/tickets/create" element={<CreateTicket />} />
           <Route path="/dashboard" element={<EmployeeDashboard />} />
+          <Route path="/profile" element={<MinimalProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>
