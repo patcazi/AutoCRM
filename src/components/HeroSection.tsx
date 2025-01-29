@@ -1,5 +1,3 @@
-import React from 'react'
-
 function HeroSection() {
   return (
     <section className="bg-white py-16">
