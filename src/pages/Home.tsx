@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import HeroSection from '../components/HeroSection'
 
 type TicketStats = {
   total: number
@@ -40,83 +41,81 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Welcome Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Welcome to AutoCRM
-        </h1>
-        <p className="text-lg text-gray-600">
-          Manage your customer relationships with ease
-        </p>
-      </div>
+    <>
+      <HeroSection />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Create New Ticket */}
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between h-full">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Create New Ticket</h2>
+              <p className="text-gray-600 mb-4">
+                Need help? Submit a new support ticket and we'll get back to you as soon as possible.
+              </p>
+            </div>
+            <div>
+              <Link
+                to="/tickets/create"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors w-full text-center"
+              >
+                Create Ticket
+              </Link>
+            </div>
+          </div>
 
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Create Ticket Card */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Create New Ticket
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Create and manage support tickets for your customers
-          </p>
-          <Link
-            to="/tickets/create"
-            className="inline-flex items-center justify-center w-full bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors"
-          >
-            Create Ticket
-          </Link>
+          {/* View Tickets */}
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between h-full">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">View Tickets</h2>
+              <p className="text-gray-600 mb-4">
+                Check the status of your existing support tickets and view responses.
+              </p>
+            </div>
+            <div>
+              <Link
+                to="/tickets"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors w-full text-center"
+              >
+                View All Tickets
+              </Link>
+            </div>
+          </div>
+
+          {/* Profile */}
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between h-full">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
+              <p className="text-gray-600 mb-4">
+                View and manage your profile settings and preferences.
+              </p>
+            </div>
+            <div>
+              <Link
+                to="/profile"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors w-full text-center"
+              >
+                Go to Profile
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* View Tickets Card */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            View Tickets
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Browse and manage all your existing support tickets
-          </p>
-          <Link
-            to="/tickets"
-            className="inline-flex items-center justify-center w-full bg-white border border-blue-600 text-blue-600 px-4 py-2 rounded-md font-medium hover:bg-blue-50 transition-colors"
-          >
-            View All Tickets
-          </Link>
-        </div>
-
-        {/* Profile Card */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Your Profile
-          </h2>
-          <p className="text-gray-600 mb-4">
-            View and manage your account settings
-          </p>
-          <Link
-            to="/profile"
-            className="inline-flex items-center justify-center w-full bg-white border border-blue-600 text-blue-600 px-4 py-2 rounded-md font-medium hover:bg-blue-50 transition-colors"
-          >
-            Go to Profile
-          </Link>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-          <div className="text-2xl font-bold text-blue-600">{stats.open}</div>
-          <div className="text-gray-600">Open Tickets</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-          <div className="text-2xl font-bold text-green-600">{stats.resolvedToday}</div>
-          <div className="text-gray-600">Resolved Today</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-          <div className="text-2xl font-bold text-purple-600">{stats.total}</div>
-          <div className="text-gray-600">Total Tickets</div>
+        {/* Stats Section */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+            <div className="text-2xl font-bold text-blue-600">{stats.open}</div>
+            <div className="text-gray-600">Open Tickets</div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+            <div className="text-2xl font-bold text-green-600">{stats.resolvedToday}</div>
+            <div className="text-gray-600">Resolved Today</div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+            <div className="text-2xl font-bold text-purple-600">{stats.total}</div>
+            <div className="text-gray-600">Total Tickets</div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

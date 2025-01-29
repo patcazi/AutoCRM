@@ -69,7 +69,7 @@ export default function Layout() {
             {/* Logo/Brand */}
             <div className="flex-shrink-0">
               <Link to="/" className="text-blue-600 font-bold text-xl">
-                AutoCRM
+                Singularity Solutions
               </Link>
             </div>
 
